@@ -23,8 +23,8 @@ jobs:
 
       - name: Build Docker Image
         run: |
-          docker build -t javalon007/test-repo:${{ steps.vars.outputs.SHORT_SHA }} .
+          docker build -t javalon007/test-repo:${{ github.sha }} .
 
       - name: Push Docker Imge
         run: |
-          docker push javalon007/test-repo:${{ steps.vars.outputs.SHORT_SHA }}
+          docker push javalon007/test-repo:${{ github.sha }}
