@@ -61,7 +61,7 @@ jobs:
 
       - name: Upload compose file to VPS
         run: |
-          scp docker-compose.yml ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:/home/${{ secrets.DEPLOY_USER }}/app/docker-compose.yml
+          scp -o "PasswordAuthentication no" docker-compose.yml ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:/home/${{ secrets.DEPLOY_USER }}/app/docker-compose.yml
 
       - name: Deploy via SSH with Docker Stack
         run: |
