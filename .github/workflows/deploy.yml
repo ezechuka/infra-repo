@@ -61,11 +61,11 @@ jobs:
 
       - name: Upload compose file to VPS
         run: |
-          scp -o "PasswordAuthentication no" docker-compose.yml ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:/home/${{ secrets.DEPLOY_USER }}/app/docker-compose.yml
+          scp -o StrictHostKeyChecking=no docker-compose.yml ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:/home/${{ secrets.DEPLOY_USER }}/app/docker-compose.yml
 
       - name: Deploy via SSH with Docker Stack
         run: |
-          ssh -o "PasswordAuthentication no" ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} << 'EOF'
+          ssh -o StrictHostKeyChecking=no ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} << 'EOF'
             docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_PASSWORD }}:${{ steps.commit.outputs.SHORT_SHA }}
             docker stack deploy -c /home/${{ secrets.DEPLOY_USER }}/app/docker-compose.yml mystack
           EOF
