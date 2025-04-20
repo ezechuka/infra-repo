@@ -14,7 +14,7 @@ services:
   frontend_service:
     image: javalon007/test-frontend-app:latest
     environment:
-      - API_URL=backend_service:5000
+      - API_URL=http://backend_service:5000
     ports:
       - "3000:3000"
     volumes:
