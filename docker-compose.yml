@@ -1,31 +1,21 @@
-version: "3"
+version: "3.8"
 services:
-  app1:
+  backend_service:
     image: javalon007/test-repo:latest
-    build:
-      context: ./app1
-      dockerfile: Dockerfile
-    environment:
-      - APP_NAME=App1
+    deploy:
+      replicas: 3
+      restart_policy:
+        condition: on-failure
     ports:
-      - "3001:3000"
+      - "5000:5000"
+    volumes:
+      - /backend/node_modules
 
-  app2:
-    image: javalon007/test-repo:latest
-    build:
-      context: ./app2
-      dockerfile: Dockerfile
-    environment:
-      - APP_NAME=App2
+  frontend_service:
+    image: javalon007/test-frontend-repo:latest
     ports:
-      - "3002:3000"
-
-  app3:
-    image: javalon007/test-repo:latest
-    build:
-      context: ./app2
-      dockerfile: Dockerfile
-    environment:
-      - APP_NAME=App3
-    ports:
-      - "3003:3000"
+      - "3000:3000"
+    volumes:
+      - /frontend/node_modules
+    depends_on:
+      - backend_service

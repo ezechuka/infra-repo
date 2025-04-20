@@ -72,5 +72,3 @@ jobs:
           ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} << 'EOF'
             docker stack deploy -c /app/${{ secrets.DEPLOY_USER }}/docker-compose.yml mystack
           EOF
-
-# docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_PASSWORD }}:${{ steps.commit.outputs.SHORT_SHA }}
