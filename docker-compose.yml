@@ -12,7 +12,7 @@ services:
       - /backend/node_modules
 
   frontend_service:
-    image: javalon007/test-frontend-repo:latest
+    image: javalon007/test-frontend-app:latest
     ports:
       - "3000:3000"
     volumes:
