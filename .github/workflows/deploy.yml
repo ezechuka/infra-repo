@@ -65,6 +65,7 @@ jobs:
 
       - name: Upload compose file to VPS
         run: |
+          scp -r conf ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:/app/${{ secrets.DEPLOY_USER }}/conf
           scp docker-compose.yml ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:/app/${{ secrets.DEPLOY_USER }}/docker-compose.yml
 
       - name: Deploy via SSH with Docker Stack
