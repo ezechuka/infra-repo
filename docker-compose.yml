@@ -10,6 +10,8 @@ services:
       - "5000:5000"
     volumes:
       - /backend/node_modules
+    networks:
+      - test_network
 
   frontend_service:
     image: javalon007/test-frontend-app:latest
@@ -21,3 +23,23 @@ services:
       - /frontend/node_modules
     depends_on:
       - backend_service
+    networks:
+      - test_network
+
+  nginx_rp_gateway:
+    container_name: nginx_rp_gateway
+    image: nginx:1.16.0
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./conf:/etc/nginx/conf.d/
+    depends_on:
+      - frontend_service
+      - backend_service
+    networks:
+      - test_network
+
+networks:
+  test_network:
+    driver: bridge
