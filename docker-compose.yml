@@ -27,7 +27,6 @@ services:
       - test_network
 
   nginx_rp_gateway:
-    container_name: nginx_rp_gateway
     image: nginx:1.16.0
     ports:
       - 80:80
@@ -42,4 +41,4 @@ services:
 
 networks:
   test_network:
-    driver: bridge
+    driver: overlay
