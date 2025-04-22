@@ -1,7 +1,7 @@
 version: "3.8"
 services:
   backend_service:
-    image: javalon007/test-repo:latest
+    image: javalon007/test-repo:${TAG}
     deploy:
       replicas: 3
       restart_policy:
@@ -14,7 +14,7 @@ services:
       - test_network
 
   frontend_service:
-    image: javalon007/test-frontend-app:latest
+    image: javalon007/test-frontend-app:${TAG}
     ports:
       - "3000:3000"
     volumes:
