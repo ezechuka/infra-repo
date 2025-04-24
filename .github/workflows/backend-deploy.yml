@@ -55,7 +55,8 @@ jobs:
       - name: Set image tag in compose file
         run: |
           TAG=${{ needs.build-and-push.outputs.commit_sha }}
-          sed -i "s/\${TAG}/$TAG/g" docker-compose.yml
+          sed -i "s/\${BACKEND_TAG}/$TAG/g" docker-compose.yml
+          sed -i "s/\${FRONTEND_TAG}/latest/g" docker-compose.yml
 
       - name: Install SSH key
         uses: webfactory/ssh-agent@v0.9.0
