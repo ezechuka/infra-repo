@@ -57,21 +57,26 @@ jobs:
           TAG=${{ needs.build-and-push.outputs.commit_sha }}
           sed -i "s/\${FRONTEND_TAG}/$TAG/g" docker-compose.frontend.yml
 
+      - name: Install SSH key
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.DEPLOY_KEY }}
+
       - name: Add VPS to known_hosts
         run: |
-          mkdir -p ~/.ssh
           ssh-keyscan -H ${{ secrets.DEPLOY_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Copy docker compose file to VPS
+      - name: Ensure remote folder exists
+        run: |
+          ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "mkdir -p /app/${{ secrets.DEPLOY_USER }}"
+
+      - name: Upload compose file to VPS
         run: |
           scp docker-compose.frontend.yml ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:/app/${{ secrets.DEPLOY_USER }}/docker-compose.frontend.yml
 
-      - name: SSH into VPS and update frontend service
-        uses: appleboy/ssh-action@v1
-        with:
-          host: ${{ secrets.DEPLOY_HOST }}
-          username: ${{ secrets.DEPLOY_USER }}
-          key: ${{ secrets.DEPLOY_KEY }}
-          script: |
+      - name: Deploy via SSH with Docker Stack
+        run: |
+          ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} << 'EOF'
             docker service update --image ${{ secrets.DOCKER_USERNAME }}/${{ env.REPO }}:${{ needs.build-and-push.outputs.commit_sha }} mystack_frontend_service || \
             docker stack deploy -c /app/${{ secrets.DEPLOY_USER }}/docker-compose.frontend.yml mystack
+          EOF
