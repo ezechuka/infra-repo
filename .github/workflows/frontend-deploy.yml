@@ -57,6 +57,10 @@ jobs:
           TAG=${{ needs.build-and-push.outputs.commit_sha }}
           sed -i "s/\${FRONTEND_TAG}/$TAG/g" docker-compose.frontend.yml
 
+      - name: Add VPS to known_hosts
+        run: |
+          ssh-keyscan -H ${{ secrets.DEPLOY_HOST }} >> ~/.ssh/known_hosts
+
       - name: Upload compose file to VPS
         run: |
           scp docker-compose.frontend.yml ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:/app/${{ secrets.DEPLOY_USER }}/docker-compose.frontend.yml

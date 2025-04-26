@@ -57,6 +57,10 @@ jobs:
           TAG=${{ needs.build-and-push.outputs.commit_sha }}
           sed -i "s/\${BACKEND_TAG}/$TAG/g" docker-compose.backend.yml
 
+      - name: Add VPS to known_hosts
+        run: |
+          ssh-keyscan -H ${{ secrets.DEPLOY_HOST }} >> ~/.ssh/known_hosts
+
       - name: Upload compose file to VPS
         run: |
           scp docker-compose.backend.yml ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:/app/${{ secrets.DEPLOY_USER }}/docker-compose.backend.yml
@@ -70,4 +74,4 @@ jobs:
           script: |
             scp docker-compose.backend.yml ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:/app/${{ secrets.DEPLOY_USER }}/docker-compose.backend.yml
             docker service update --image ${{ secrets.DOCKER_USERNAME }}/${{ env.REPO }}:${{ needs.build-and-push.outputs.commit_sha }} mystack_backend_service || \
-            docker stack deploy -c docker-compose.backend.yml mystack
+            docker stack deploy -c /app/${{ secrets.DEPLOY_USER }}/docker-compose.backend.yml mystack
