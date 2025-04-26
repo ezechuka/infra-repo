@@ -57,6 +57,10 @@ jobs:
           TAG=${{ needs.build-and-push.outputs.commit_sha }}
           sed -i "s/\${BACKEND_TAG}/$TAG/g" docker-compose.backend.yml
 
+      - name: Upload compose file to VPS
+        run: |
+          scp docker-compose.backend.yml ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:/app/${{ secrets.DEPLOY_USER }}/docker-compose.backend.yml
+
       - name: SSH into VPS and update backend service
         uses: appleboy/ssh-action@v1
         with:
