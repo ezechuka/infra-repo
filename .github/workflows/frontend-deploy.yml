@@ -62,10 +62,6 @@ jobs:
           mkdir -p ~/.ssh
           ssh-keyscan -H ${{ secrets.DEPLOY_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Upload compose file to VPS
-        run: |
-          scp docker-compose.frontend.yml ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:/app/${{ secrets.DEPLOY_USER }}/docker-compose.frontend.yml
-
       - name: SSH into VPS and update frontend service
         uses: appleboy/ssh-action@v1
         with:
