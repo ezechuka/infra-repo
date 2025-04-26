@@ -1,0 +1,16 @@
+version: "3.8"
+services:
+  frontend_service:
+    image: javalon007/test-frontend-app:${FRONTEND_TAG}
+    ports:
+      - "3000:3000"
+    volumes:
+      - /frontend/node_modules
+    depends_on:
+      - backend_service
+    networks:
+      - test_network
+
+networks:
+  test_network:
+    external: true

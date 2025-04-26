@@ -55,29 +55,14 @@ jobs:
       - name: Set image tag in compose file
         run: |
           TAG=${{ needs.build-and-push.outputs.commit_sha }}
-          sed -i "s/\${BACKEND_TAG}/$TAG/g" docker-compose.yml
-          sed -i "s/\${FRONTEND_TAG}/latest/g" docker-compose.yml
+          sed -i "s/\${BACKEND_TAG}/$TAG/g" docker-compose.backend.yml
 
-      - name: Install SSH key
-        uses: webfactory/ssh-agent@v0.9.0
+      - name: SSH into VPS and update backend service
+        uses: appleboy/ssh-action@v1
         with:
-          ssh-private-key: ${{ secrets.DEPLOY_KEY }}
-
-      - name: Add VPS to known_hosts
-        run: |
-          ssh-keyscan -H ${{ secrets.DEPLOY_HOST }} >> ~/.ssh/known_hosts
-
-      - name: Ensure remote folder exists
-        run: |
-          ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "mkdir -p /app/${{ secrets.DEPLOY_USER }}"
-
-      - name: Upload compose file to VPS
-        run: |
-          scp -r conf ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:/app/${{ secrets.DEPLOY_USER }}
-          scp docker-compose.yml ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:/app/${{ secrets.DEPLOY_USER }}/docker-compose.yml
-
-      - name: Deploy via SSH with Docker Stack
-        run: |
-          ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} << 'EOF'
-            docker stack deploy -c /app/${{ secrets.DEPLOY_USER }}/docker-compose.yml mystack
-          EOF
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_KEY }}
+          script: |
+            docker service update --image ${{ secrets.DOCKER_USERNAME }}/${{ env.REPO }}:${{ needs.build-and-push.outputs.commit_sha }} mystack_backend_service || \
+            docker stack deploy -c docker-compose.backend.yml mystack
