@@ -62,6 +62,10 @@ jobs:
           mkdir -p ~/.ssh
           ssh-keyscan -H ${{ secrets.DEPLOY_HOST }} >> ~/.ssh/known_hosts
 
+      - name: Copy docker compose file to VPS
+        run: |
+          scp docker-compose.backend.yml ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:/app/${{ secrets.DEPLOY_USER }}/docker-compose.backend.yml
+
       - name: SSH into VPS and update backend service
         uses: appleboy/ssh-action@v1
         with:
@@ -69,6 +73,5 @@ jobs:
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_KEY }}
           script: |
-            scp docker-compose.backend.yml ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:/app/${{ secrets.DEPLOY_USER }}/docker-compose.backend.yml
             docker service update --image ${{ secrets.DOCKER_USERNAME }}/${{ env.REPO }}:${{ needs.build-and-push.outputs.commit_sha }} mystack_backend_service || \
             docker stack deploy -c /app/${{ secrets.DEPLOY_USER }}/docker-compose.backend.yml mystack
