@@ -10,6 +10,8 @@ services:
       - "5000:5000"
     volumes:
       - /backend/node_modules
+    secrets:
+      - PUBLIC_KEY
     networks:
       - test_network
 
@@ -26,6 +28,10 @@ services:
       - backend_service
     networks:
       - test_network
+
+secrets:
+  PUBLIC_KEY:
+    external: true
 
 networks:
   test_network:

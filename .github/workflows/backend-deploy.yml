@@ -74,6 +74,16 @@ jobs:
         run: |
           scp docker-compose.backend.yml ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:/app/${{ secrets.DEPLOY_USER }}/docker-compose.backend.yml
 
+      - name: Create docker secrets
+        run: |
+          ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} << 'EOF'
+            create_secret() {
+              echo "$2" | docker create secret "1$" - 2>/dev/null || echo "Secret $1 already exists"
+            }
+
+            create_secret PUBLIC_KEY "${{ secrets.PUBLIC_KEY }}"
+          EOF
+
       - name: Deploy via SSH with Docker Stack
         run: |
           ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} << 'EOF'
