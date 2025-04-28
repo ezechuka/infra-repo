@@ -79,15 +79,18 @@ jobs:
         run: |
           scp docker-compose.backend.yml ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:/app/${{ secrets.DEPLOY_USER }}/docker-compose.backend.yml
 
+      - name: Create docker secret
+        run: |
+          ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} \
+          create_secret() {
+              echo "$2" | docker create secret "1$" - 2>/dev/null || echo "Secret $1 already exists"
+          }
+
+          create_secret PUBLIC_KEY "${{ secrets.PUBLIC_KEY }}"
+
       - name: Deploy via SSH with Docker Stack
         run: |
-          ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} << 'EOF'
-            create_secret() {
-              echo "$2" | docker create secret "1$" - 2>/dev/null || echo "Secret $1 already exists"
-            }
-
-            create_secret PUBLIC_KEY "${{ secrets.PUBLIC_KEY }}"
-            
+          ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} << EOF
             docker network ls | grep test_network || docker network create --driver overlay --attachable test_network
             docker service update --image ${{ secrets.DOCKER_USERNAME }}/${{ env.REPO }}:${{ needs.build-and-push.outputs.commit_sha }} mystack_backend_service || \
             docker stack deploy -c /app/${{ secrets.DEPLOY_USER }}/docker-compose.backend.yml mystack
