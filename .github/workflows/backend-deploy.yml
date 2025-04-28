@@ -81,12 +81,17 @@ jobs:
 
       - name: Create docker secret
         run: |
-          ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} \
-          create_secret() {
-              echo "$2" | docker create secret "$1" - 2>/dev/null || echo "Secret $1 already exists"
-          }
+          ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} bash -s << EOF
+            create_secret() {
+                echo "\$2" | docker secret create "\$1" - 2>/dev/null || echo "Secret \$1 already exists"
+            }
 
-          create_secret PUBLIC_KEY "${{ secrets.PUBLIC_KEY }}"
+            PUBLIC_KEY="${{ secrets.PUBLIC_KEY }}"
+            PRIVATE_KEY="${{ secrets.PRIVATE_KEY }}"
+
+            create_secret PUBLIC_KEY "\$PUBLIC_KEY"
+            create_secret PRIVATE_KEY "\$PRIVATE_KEY"
+          EOF
 
       - name: Deploy via SSH with Docker Stack
         run: |
