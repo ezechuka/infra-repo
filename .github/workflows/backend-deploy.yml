@@ -83,7 +83,7 @@ jobs:
         run: |
           ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} \
           create_secret() {
-              echo "$2" | docker create secret "1$" - 2>/dev/null || echo "Secret $1 already exists"
+              echo "$2" | docker create secret "$1" - 2>/dev/null || echo "Secret $1 already exists"
           }
 
           create_secret PUBLIC_KEY "${{ secrets.PUBLIC_KEY }}"
